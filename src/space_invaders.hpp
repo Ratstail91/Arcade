@@ -25,6 +25,9 @@
 #include "base_scene.hpp"
 
 #include "generic_entity.hpp"
+#include "image.hpp"
+
+#include <vector>
 
 class SpaceInvaders : public BaseScene {
 public:
@@ -48,6 +51,8 @@ protected:
 
 	//members
 	GenericEntity player;
+	std::vector<GenericEntity> bullets;
+	GenericEntity bulletTemplate;
 };
 
 #endif

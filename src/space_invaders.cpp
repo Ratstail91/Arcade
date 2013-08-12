@@ -30,6 +30,7 @@ using namespace std;
 //-------------------------
 
 #define PLAYER_SPEED 140
+#define BULLET_SPEED 400
 
 //-------------------------
 //Public access members
@@ -42,6 +43,11 @@ SpaceInvaders::SpaceInvaders() {
 	player.SetBBoxH(static_cast<double>(player.GetSprite()->GetImage()->GetClipH()));
 	player.SetX(400 - player.GetBBoxW() / 2);
 	player.SetY(550);
+
+	//setup the bullets
+	bulletTemplate.GetSprite()->LoadSurface("rsc\\bullet.bmp", 1, 1);
+	bulletTemplate.SetBBoxW(static_cast<double>(bulletTemplate.GetSprite()->GetImage()->GetClipW()));
+	bulletTemplate.SetBBoxH(static_cast<double>(bulletTemplate.GetSprite()->GetImage()->GetClipH()));
 }
 
 SpaceInvaders::~SpaceInvaders() {
@@ -66,6 +72,15 @@ void SpaceInvaders::Update(double delta) {
 	if (player.GetX() + player.GetBBoxW() >= GetScreen()->w) {
 		player.SetX(GetScreen()->w - player.GetBBoxW());
 	}
+
+	//update the bullets
+	for (auto& it : bullets) {
+		it.Update(delta);
+	}
+
+	//TODO: check bullets aren't out of the window
+
+	//TODO: check bullets aren't colliding with something
 }
 
 void SpaceInvaders::FrameEnd() {
@@ -74,6 +89,9 @@ void SpaceInvaders::FrameEnd() {
 
 void SpaceInvaders::Render(SDL_Surface* const screen) {
 	player.DrawTo(screen);
+	for (auto& it : bullets) {
+		it.DrawTo(screen);
+	}
 }
 
 //-------------------------
@@ -109,6 +127,14 @@ void SpaceInvaders::KeyDown(SDL_KeyboardEvent const& key) {
 			if (player.GetMotionX() <= 0) {
 				player.SetMotionX(player.GetMotionX() + PLAYER_SPEED); //shift
 			}
+		break;
+
+		case SDLK_SPACE:
+			//shoot a bullet
+			bullets.push_back(bulletTemplate);
+			bullets.back().SetMotionY(-BULLET_SPEED);
+			bullets.back().SetX(player.GetX() + player.GetBBoxW()/2 - bulletTemplate.GetBBoxW()/2);
+			bullets.back().SetY(player.GetY() - bulletTemplate.GetBBoxH());
 		break;
 	}
 }
