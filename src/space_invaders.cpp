@@ -44,10 +44,12 @@ SpaceInvaders::SpaceInvaders() {
 	player.SetX(400 - player.GetBBoxW() / 2);
 	player.SetY(550);
 
-	//setup the bullets
-	bulletTemplate.GetSprite()->LoadSurface("rsc\\bullet.bmp", 1, 1);
-	bulletTemplate.SetBBoxW(static_cast<double>(bulletTemplate.GetSprite()->GetImage()->GetClipW()));
-	bulletTemplate.SetBBoxH(static_cast<double>(bulletTemplate.GetSprite()->GetImage()->GetClipH()));
+	//setup the player's bullet
+	playerBullet.GetSprite()->LoadSurface("rsc\\bullet.bmp", 1, 1);
+	playerBullet.SetBBoxW(static_cast<double>(playerBullet.GetSprite()->GetImage()->GetClipW()));
+	playerBullet.SetBBoxH(static_cast<double>(playerBullet.GetSprite()->GetImage()->GetClipH()));
+	playerBullet.SetY(-playerBullet.GetBBoxH());
+	playerBullet.SetMotionY(-BULLET_SPEED);
 }
 
 SpaceInvaders::~SpaceInvaders() {
@@ -65,18 +67,17 @@ void SpaceInvaders::FrameStart() {
 void SpaceInvaders::Update(double delta) {
 	//update the player
 	player.Update(delta);
+
+	//bounding
 	if (player.GetX() <= 0) {
 		player.SetX(0);
 	}
-
 	if (player.GetX() + player.GetBBoxW() >= GetScreen()->w) {
 		player.SetX(GetScreen()->w - player.GetBBoxW());
 	}
 
-	//update the bullets
-	for (auto& it : bullets) {
-		it.Update(delta);
-	}
+	//update the bullet
+	playerBullet.Update(delta);
 
 	//TODO: check bullets aren't out of the window
 
@@ -89,9 +90,7 @@ void SpaceInvaders::FrameEnd() {
 
 void SpaceInvaders::Render(SDL_Surface* const screen) {
 	player.DrawTo(screen);
-	for (auto& it : bullets) {
-		it.DrawTo(screen);
-	}
+	playerBullet.DrawTo(screen);
 }
 
 //-------------------------
@@ -130,11 +129,11 @@ void SpaceInvaders::KeyDown(SDL_KeyboardEvent const& key) {
 		break;
 
 		case SDLK_SPACE:
-			//shoot a bullet
-			bullets.push_back(bulletTemplate);
-			bullets.back().SetMotionY(-BULLET_SPEED);
-			bullets.back().SetX(player.GetX() + player.GetBBoxW()/2 - bulletTemplate.GetBBoxW()/2);
-			bullets.back().SetY(player.GetY() - bulletTemplate.GetBBoxH());
+			//shoot the player's bullet
+			if (playerBullet.GetY() <= -playerBullet.GetBBoxH()) {
+				playerBullet.SetX(player.GetX() + player.GetBBoxW()/2 - playerBullet.GetBBoxW()/2);
+				playerBullet.SetY(player.GetY() - playerBullet.GetBBoxH());
+			}
 		break;
 	}
 }

@@ -25,9 +25,15 @@
 #include "base_scene.hpp"
 
 #include "generic_entity.hpp"
-#include "image.hpp"
 
 #include <vector>
+
+/* Specifications
+ * Only one of the player's bullets can exist on the screen at any one time.
+ * Three enemy bullets exist at any one time.
+ * 5 rows of enemies, each a certain type.
+ * ...
+*/
 
 class SpaceInvaders : public BaseScene {
 public:
@@ -51,8 +57,7 @@ protected:
 
 	//members
 	GenericEntity player;
-	std::vector<GenericEntity> bullets;
-	GenericEntity bulletTemplate;
+	GenericEntity playerBullet;
 };
 
 #endif
